@@ -85,6 +85,7 @@ uint8_t last_button_event_dn;
 static uint8_t global_scan_complete = 0;
 static uint8_t global_scan_elements = 0;
 static uint8_t global_scan_data[2048];  //Where SSID, channel, power go.
+int force_channel = 0; //for SoftAP mode.
 
 static int ICACHE_FLASH_ATTR SwitchToSoftAP( int chadvance )
 {
@@ -102,6 +103,8 @@ static int ICACHE_FLASH_ATTR SwitchToSoftAP( int chadvance )
 	c.channel += chadvance;
 	if( c.channel <= 0 ) c.channel = 13;
 	if( c.channel > 13 ) c.channel = 1;
+
+	if( force_channel ) c.channel  = force_channel;
 
 	c.authmode = NULL_MODE;
 	c.ssid_hidden = 0;
@@ -681,7 +684,6 @@ skip_status:
 		espconn_send( (struct espconn *)pUdpServer, &mypacket[PACK_PAYLOAD_START], pp - &mypacket[PACK_PAYLOAD_START]  );
 	}
 
-
 #ifdef ADMIN_BADGE
 	if( do_admin_send )
 	{
@@ -873,10 +875,11 @@ void ICACHE_FLASH_ATTR charrx( uint8_t c )
 
 	static uint8_t sendmark;
 	static uint8_t sendthis;
-	//printf( "GOT: %c %d %d %d\n", c, adminsendplace, sendmark, do_admin_send );
+
 	if( do_admin_send ) sendmark = 0xff;
 	if( c == '\n' )
 	{
+		//printf( "%d %d\n", sendmark, adminsendplace );
 		if( sendmark == 0xff )
 		{
 			sendmark = 0;
@@ -886,6 +889,7 @@ void ICACHE_FLASH_ATTR charrx( uint8_t c )
 			//Transmit
 			if( adminsendplace > 4 )
 			{
+				//printf( "DAS\n" );
 				do_admin_send = 1;
 			}
 			else
@@ -946,7 +950,7 @@ void ICACHE_FLASH_ATTR user_init(void)
 
 	int firstbuttons = GetButtons();
 	if( firstbuttons & 0x20 ) disable_deep_sleep = 1;
-	if( firstbuttons & 0x10 )
+	if( (firstbuttons & 0x10) || force_channel )
 	{
 		SwitchToSoftAP( 0 );
 

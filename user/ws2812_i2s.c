@@ -42,6 +42,8 @@ Extra copyright info:
 #include "user_interface.h"
 #include "pin_mux_register.h"
 
+extern int force_channel;
+
 //Creates an I2S SR of 93,750 Hz, or 3 MHz Bitclock (.333us/sample)
 // 1600000000L/(div*bestbck)
 //It is likely you could speed this up a little.
@@ -365,7 +367,8 @@ void ICACHE_FLASH_ATTR ws2812_init()
 //----
 
 	//Init pins to i2s functions
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_I2SO_DATA);
+	if( !force_channel ) //Allow LED output
+		PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_I2SO_DATA);
 //	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_I2SO_WS);
 //	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDO_U, FUNC_I2SO_BCK);
 
