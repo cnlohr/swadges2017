@@ -44,7 +44,10 @@ Status updates are sent to the server, responded to and/or 802.11n broadcasted w
 
 	//Badge Status Update, sent at connect, after 10 seconds, upon request and button click.
 	//  TO BADGE 0x11: Request status update.
-	//  FROM BADGE 0x01: [0 reserved (could be version in future)] [RSSI] [BSSID of currently connected AP x6] [GPIO State] [Last button event, 0 if no events, 1-8 for button] [was last button event down] [Average LED power] [system 3.3v 2bytes] [status update count 2bytes] [heap free 2bytes] [sleep performance ratio] [0, reserved] [current time 4bytes]
+	//  FROM BADGE 0x01: [Version] [RSSI] [BSSID of currently connected AP x6] [GPIO State] [Last button event, 0 if no events, 1-8 for button] [was last button event down] [Average LED power] [system 3.3v 2bytes] [status update count 2bytes] [heap free 2bytes] [sleep performance ratio] [0, reserved] [current time 4bytes]
+	//  NOTE: On badge code
+	//  Version 0: What is in packet.
+	//  Version 3: MAGStock 2018: Average LED power is # of leds; Code 0x13 is allowed.
 
 
 	//Control WS2812Bs on badge.
@@ -66,6 +69,10 @@ Status updates are sent to the server, responded to and/or 802.11n broadcasted w
 
 	//Force deep sleep (UDP only)
 	//    TO PADGE 0x09: [sleep ms MSB (4 bytes)] [0xaa, must be 0xaa]
+	
+	//Read LEDs
+	//	To swadge: 0x13
+	//	From Swadge: 0x14 [number of leds] [led data]
 ```
 
 ## Pinouts
